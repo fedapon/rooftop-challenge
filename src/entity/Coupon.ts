@@ -11,13 +11,14 @@ export default class Coupon extends AbstractEntity {
 
     @Column({
         name : 'expires_at',
-        type : 'time with time zone'
+        type : 'timestamptz',
+        nullable : true
     })
     expiresAt : Date
 
     @Column({
         name : 'assigned_at',
-        type : 'time with time zone',
+        type : 'timestamptz',
         nullable : true
     })
     assignedAt : Date
