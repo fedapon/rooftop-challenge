@@ -5,6 +5,7 @@ import express = require('express')
 import getValidation from '../validators/coupons/getValidation'
 import postValidation from '../validators/coupons/postValidation'
 import patchValidation from '../validators/coupons/patchValidation'
+import deleteValidation from '../validators/coupons/deleteValidation'
 
 
 const couponsRouter = express.Router()
@@ -12,20 +13,16 @@ const couponsRouter = express.Router()
 const connection = createConnection()
 
 couponsRouter.get('/coupons', (async function(req, res) {
+    //validation
     let validationResult = getValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(404).json({message : validationResult.error.details[0].message})
     }
     
     try {
-        let query : any = {
-            code : req.body.code,
-            customerEmail : req.body.customer_email
-        }
-
         let repository = (await connection).getRepository(Coupon)
         //try to find code and email match
-        repository.findOne(query)
+        repository.findOne({code : req.body.code, customerEmail : req.body.customer_email})
             .then(data => {
                 if (data == undefined) {
                     return res.status(404).json({message : 'Coupon code and email were not found.'})
@@ -43,6 +40,7 @@ couponsRouter.get('/coupons', (async function(req, res) {
 }))
 
 couponsRouter.post('/coupons', async function (req, res) {
+    //validation
     let validationResult = postValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
@@ -71,6 +69,7 @@ couponsRouter.post('/coupons', async function (req, res) {
 })
 
 couponsRouter.patch('/coupons', async function (req, res) {
+    //validation
     let validationResult = patchValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
@@ -81,7 +80,7 @@ couponsRouter.patch('/coupons', async function (req, res) {
         //check that the email wasn't already used
         let emailAvailable = await repository.findOne({customerEmail : req.body.customer_email})
         if (emailAvailable) {
-            return res.status(422).json({message : 'email was already used'})
+            return res.status(422).json({message : 'Email was already been used'})
         }
 
         //check that the code exists and isn't expired
@@ -90,14 +89,14 @@ couponsRouter.patch('/coupons', async function (req, res) {
         if ( (codeAvailable == undefined) || 
             ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) 
             ) {
-            return res.status(422).json({message : 'code is not available'})
+            return res.status(422).json({message : 'Code is not available'})
         }
 
         codeAvailable.customerEmail = req.body.customer_email
         codeAvailable.assignedAt = currentTime
         repository.save(codeAvailable)
             .then(() => {
-                return res.status(201).json({message : 'Code successfully used'})
+                return res.status(201).json({message : 'Code successfully consumed'})
             })
             .catch(err => {
                 return res.status(422).json({message : err.message})
@@ -105,6 +104,40 @@ couponsRouter.patch('/coupons', async function (req, res) {
         }
 
     catch (err) {
+        return res.status(422).json({message : err.message})
+    }
+
+})
+
+couponsRouter.delete('/coupons', async function(req, res) {
+    //validation
+    let validationResult = deleteValidation.validate(req.body)
+    if (validationResult.error) {
+        return res.status(422).json({message : validationResult.error.details[0].message})
+    }
+
+    try {
+        let repository = (await connection).getRepository(Coupon)
+        let codeToDelete = await repository.findOne({code : req.body.code})
+
+        //check if code exist or has been used by an email
+        if (codeToDelete==undefined) {
+            return res.status(422).json({message : 'Code does not exist'})
+        }
+        if (codeToDelete.customerEmail != null) {
+            return res.status(422).json({message : 'Code was already been used'})
+        }
+
+        //everything checked, let's delete
+        repository.delete(codeToDelete)
+            .then(()=>{
+                return res.status(201).json({message : 'Code successfully deleted'})
+            })
+            .catch(err=> {
+                return res.status(422).json({message : err.message})
+            })
+
+    } catch (err) {
         return res.status(422).json({message : err.message})
     }
 
