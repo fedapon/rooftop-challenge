@@ -25,9 +25,9 @@ couponsRouter.get('/coupons', (async function(req, res) {
         repository.findOne({code : req.body.code, customerEmail : req.body.customer_email})
             .then(data => {
                 if (data == undefined) {
-                    return res.status(404).json({message : 'Coupon code and email were not found.'})
+                    return res.status(404).json({message : 'Coupon code and email was not found'})
                 }
-                return res.status(200).json({message : 'Match found.'})
+                return res.status(200).json({message : 'Coupon and email match was found'})
             })
             .catch(err => {
                 return res.status(404).json({message : err.message})
@@ -45,18 +45,24 @@ couponsRouter.post('/coupons', async function (req, res) {
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
-
-    let coupon = new Coupon()
-    coupon.code = req.body.code
-    if (req.body.expires_at) {
-        coupon.expiresAt = req.body.expires_at
-    }
     
     try {
         let repository = (await connection).getRepository(Coupon)
+        
+        //check if code already exists
+        let searchedCode = await repository.findOne({code : req.body.code})
+        if (searchedCode != undefined) {
+            return res.status(422).json({message : 'Coupon code already exists'})
+        }
+
+        //lets add the new code to the repository
+        let coupon : any = {
+            code : req.body.code,
+            expiresAt : req.body.expires_at
+        }
         repository.save(coupon)
             .then(()=>{
-                return res.status(201).json({message : 'Code successfully created'})
+                return res.status(201).json({message : 'Coupon successfully created'})
             })
             .catch(err => {
                 return res.status(422).json({message : err.message})
@@ -89,14 +95,14 @@ couponsRouter.patch('/coupons', async function (req, res) {
         if ( (codeAvailable == undefined) || 
             ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) 
             ) {
-            return res.status(422).json({message : 'Code is not available'})
+            return res.status(422).json({message : 'Coupon is not available'})
         }
 
         codeAvailable.customerEmail = req.body.customer_email
         codeAvailable.assignedAt = currentTime
         repository.save(codeAvailable)
             .then(() => {
-                return res.status(201).json({message : 'Code successfully consumed'})
+                return res.status(201).json({message : 'Coupon successfully consumed'})
             })
             .catch(err => {
                 return res.status(422).json({message : err.message})
