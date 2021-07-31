@@ -1,10 +1,10 @@
 import joi from 'joi'
 
-const newCoupon = joi.object({
+const postValidation = joi.object({
     code : joi.string().alphanum().length(8).required(),
   
     expires_at : joi.date().empty().greater('now')
 
 })
 
-export default newCoupon
+export default postValidation
