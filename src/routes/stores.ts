@@ -3,6 +3,7 @@ import { createConnection, Like } from 'typeorm'
 import Store from '../entity/Store'
 import express = require('express')
 import postValidation from '../validators/stores/postValidation'
+import deleteValidation from '../validators/stores/deleteValidation'
 
 const storesRouter = express.Router()
 
@@ -65,6 +66,38 @@ storesRouter.post('/stores', async function(req, res) {
         repository.save(newStore)
             .then(()=> {
                 return res.status(201).json({message : 'Store successfully created'})
+            })
+            .catch((err) => {
+                return res.status(422).json({message : err.message})
+            })
+
+    } catch (err) {
+        return res.status(422).json({message : err.message})
+    }
+})
+
+storesRouter.delete('/stores', function(req, res) {
+    return res.status(422).json({message : 'id is required as a url param'})
+})
+
+storesRouter.delete('/stores/:id', async function(req, res) {
+    //validation
+    let validationResult = deleteValidation.validate(req.params)
+    if (validationResult.error) {
+        return res.status(422).json({message : validationResult.error.details[0].message})
+    }
+    try {
+        let repository = (await connection).getRepository(Store)
+        let storeToDelete = await repository.findOne(req.params)
+
+        //check if store id exist
+        if (storeToDelete==undefined) {
+            return res.status(422).json({message : 'Store does not exist'})
+        }
+
+        repository.delete(storeToDelete)
+            .then(() => {
+                return res.status(201).json({message : 'Store successfully deleted'})
             })
             .catch((err) => {
                 return res.status(422).json({message : err.message})
