@@ -8,10 +8,8 @@ Node.js v14+
 
 ### Installation
 
-It is recommended to create a new folder and then clone the project:
+First of all, you have to clone the project using:
 ```
-$ mkdir rooftop-challenge
-$ cd rooftop-challenge
 $ git clone https://github.com/fedapon/rooftop-challenge.git
 ```
 
@@ -49,10 +47,6 @@ $ npm start
 
 
 Finally the API server will be running on http://localhost:3000/
-
-There are two endpoints and they can be tested using the collection (save on example folder) for ***Postman*** app
-
-
 
 
 
