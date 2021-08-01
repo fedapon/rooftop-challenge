@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { createConnection, Like } from 'typeorm'
 import Store from '../entity/Store'
 import express = require('express')
+import postValidation from '../validators/stores/postValidation'
 
 const storesRouter = express.Router()
 
@@ -45,6 +46,32 @@ storesRouter.get('/stores', async function(req, res) {
     }
     catch (err) {
         return res.status(404).json({message : err.message})
+    }
+})
+
+storesRouter.post('/stores', async function(req, res) {
+    //validation
+    let validationResult = postValidation.validate(req.body)
+    if (validationResult.error) {
+        return res.status(422).json({message : validationResult.error.details[0].message})
+    }
+    try {
+        //lets add the new store
+        let newStore = {
+            name : req.body.name,
+            address : req.body.address
+        }
+        let repository = (await connection).getRepository(Store)
+        repository.save(newStore)
+            .then(()=> {
+                return res.status(201).json({message : 'Store successfully created'})
+            })
+            .catch((err) => {
+                return res.status(422).json({message : err.message})
+            })
+
+    } catch (err) {
+        return res.status(422).json({message : err.message})
     }
 })
 
