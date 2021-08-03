@@ -35,6 +35,22 @@ statsRouter.get('/stats', function(req, res) {
             .catch((err) => {
                 return res.status(422).json({message : err.message})
             })
+
+        //coupons assigned grouped by day
+        await repository
+                .createQueryBuilder("coupons")
+                //.select("DATE_TRUNC('day', coupons.assigned_at) as day, COUNT(coupons.assigned_at)")
+                .select("TO_CHAR(coupons.assigned_at, 'yyyy-mm-dd') as day, COUNT(coupons.assigned_at)")
+                .where("coupons.assigned_at IS NOT NULL")
+                .groupBy("TO_CHAR(coupons.assigned_at, 'yyyy-mm-dd')")
+                .orderBy("TO_CHAR(coupons.assigned_at, 'yyyy-mm-dd')", "ASC")
+                .getRawMany()
+            .then((data)=> {
+                msg['coupons_assigned_by_day'] = data
+            })
+            .catch((err) => {
+                return res.status(422).json({message : err.message})
+            })
         
         connection.close()
         return  res.status(200).json(msg)
