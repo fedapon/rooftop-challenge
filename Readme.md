@@ -68,3 +68,4 @@ https://javascript.info/async-await
 
 https://www.loginradius.com/blog/async/callback-vs-promises-vs-async-await/
 
+https://dev.to/yoshi_yoshi/typeorm-query-builder-with-subquery-490c
