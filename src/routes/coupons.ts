@@ -20,7 +20,7 @@ couponsRouter.get('/coupons', function(req, res) {
     createConnection().then(async connection => {
         let repository = connection.getRepository(Coupon)
         //try to find code and email match
-        await repository.findOne({code : req.body.code, customerEmail : req.body.customer_email})
+        repository.findOne({  code : req.body.code, customerEmail : req.body.customer_email})
             .then(data => {
                 if (data == undefined) {
                     res.status(404).json({message : 'Coupon code and email was not found'})
@@ -28,13 +28,14 @@ couponsRouter.get('/coupons', function(req, res) {
                     return
                 }
                 res.status(200).json({message : 'Coupon and email match was found'})
+                connection.close()
+                return
             })
             .catch(err => {
                 res.status(404).json({message : err.message})
+                connection.close()
+                return
             })
-        
-        connection.close()
-        return
     }) 
     .catch(err => {
         return res.status(404).json({message : err.message})
