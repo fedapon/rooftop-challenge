@@ -10,49 +10,53 @@ import deleteValidation from '../validators/coupons/deleteValidation'
 
 const couponsRouter = express.Router()
 
-const connection = createConnection()
-
-couponsRouter.get('/coupons', (async function(req, res) {
+couponsRouter.get('/coupons', function(req, res) {
     //validation
     let validationResult = getValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(404).json({message : validationResult.error.details[0].message})
     }
     
-    try {
-        let repository = (await connection).getRepository(Coupon)
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Coupon)
         //try to find code and email match
-        repository.findOne({code : req.body.code, customerEmail : req.body.customer_email})
+        await repository.findOne({code : req.body.code, customerEmail : req.body.customer_email})
             .then(data => {
                 if (data == undefined) {
-                    return res.status(404).json({message : 'Coupon code and email was not found'})
+                    res.status(404).json({message : 'Coupon code and email was not found'})
+                    connection.close()
+                    return
                 }
-                return res.status(200).json({message : 'Coupon and email match was found'})
+                res.status(200).json({message : 'Coupon and email match was found'})
             })
             .catch(err => {
-                return res.status(404).json({message : err.message})
+                res.status(404).json({message : err.message})
             })
-
-    } catch (err) {
+        
+        connection.close()
+        return
+    }) 
+    .catch(err => {
         return res.status(404).json({message : err.message})
-    }
+    })
 
-}))
+})
 
-couponsRouter.post('/coupons', async function (req, res) {
+couponsRouter.post('/coupons', function (req, res) {
     //validation
     let validationResult = postValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
     
-    try {
-        let repository = (await connection).getRepository(Coupon)
-        
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Coupon)
         //check if code already exists
         let searchedCode = await repository.findOne({code : req.body.code})
         if (searchedCode != undefined) {
-            return res.status(422).json({message : 'Coupon code already exists'})
+            res.status(422).json({message : 'Coupon code already exists'})
+            connection.close()
+            return
         }
 
         //lets add the new code to the repository
@@ -60,33 +64,39 @@ couponsRouter.post('/coupons', async function (req, res) {
             code : req.body.code,
             expiresAt : req.body.expires_at
         }
-        repository.save(coupon)
+        await repository.save(coupon)
             .then(()=>{
-                return res.status(201).json({message : 'Coupon successfully created'})
+                res.status(201).json({message : 'Coupon successfully created'})
             })
             .catch(err => {
-                return res.status(422).json({message : err.message})
+                res.status(422).json({message : err.message})
             })
+        
+        connection.close()
+        return
 
-    } catch (err) {
-        return res.status(422).json({message : err.message})
-    }
+    })
+    .catch(err => {
+        res.status(422).json({message : err.message})
+    })
     
 })
 
-couponsRouter.patch('/coupons', async function (req, res) {
+couponsRouter.patch('/coupons', function (req, res) {
     //validation
     let validationResult = patchValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
 
-    try {
-        let repository = (await connection).getRepository(Coupon)
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Coupon)
         //check that the email wasn't already used
         let emailAvailable = await repository.findOne({customerEmail : req.body.customer_email})
         if (emailAvailable) {
-            return res.status(422).json({message : 'Email was already been used'})
+            res.status(422).json({message : 'Email was already been used'})
+            connection.close()
+            return
         }
 
         //check that the code exists and isn't expired
@@ -95,58 +105,68 @@ couponsRouter.patch('/coupons', async function (req, res) {
         if ( (codeAvailable == undefined) || 
             ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) 
             ) {
-            return res.status(422).json({message : 'Coupon is not available'})
+            res.status(422).json({message : 'Coupon is not available'})
+            connection.close()
+            return
         }
 
         codeAvailable.customerEmail = req.body.customer_email
         codeAvailable.assignedAt = currentTime
-        repository.save(codeAvailable)
+        await repository.save(codeAvailable)
             .then(() => {
                 return res.status(201).json({message : 'Coupon successfully consumed'})
             })
             .catch(err => {
                 return res.status(422).json({message : err.message})
             })
-        }
-
-    catch (err) {
+        
+        connection.close()
+        return
+    })
+    .catch(err => {
         return res.status(422).json({message : err.message})
-    }
+    })
 
 })
 
-couponsRouter.delete('/coupons', async function(req, res) {
+couponsRouter.delete('/coupons', function(req, res) {
     //validation
     let validationResult = deleteValidation.validate(req.body)
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
 
-    try {
-        let repository = (await connection).getRepository(Coupon)
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Coupon)
         let codeToDelete = await repository.findOne({code : req.body.code})
 
         //check if code exist or has been used by an email
         if (codeToDelete==undefined) {
-            return res.status(422).json({message : 'Code does not exist'})
+            res.status(422).json({message : 'Code does not exist'})
+            connection.close()
+            return
         }
         if (codeToDelete.customerEmail != null) {
-            return res.status(422).json({message : 'Code was already been used'})
+            res.status(422).json({message : 'Code was already been used'})
+            connection.close()
+            return
         }
 
         //everything checked, let's delete
-        repository.delete(codeToDelete)
+        await repository.delete(codeToDelete)
             .then(()=>{
-                return res.status(201).json({message : 'Code successfully deleted'})
+                res.status(201).json({message : 'Code successfully deleted'})
             })
             .catch(err=> {
-                return res.status(422).json({message : err.message})
+                res.status(422).json({message : err.message})
             })
 
-    } catch (err) {
-        return res.status(422).json({message : err.message})
-    }
-
+        connection.close()
+        return
+    })
+    .catch(err=> {
+        res.status(422).json({message : err.message})
+    })
 })
 
 export {couponsRouter}
