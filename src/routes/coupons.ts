@@ -161,31 +161,41 @@ couponsRouter.delete('/coupons', function(req, res) {
 
     createConnection().then(async connection => {
         let repository = connection.getRepository(Coupon)
-        let codeToDelete = await repository.findOne({code : req.body.code})
+        
+        repository.findOne({code : req.body.code})
+            .then(codeToDelete=>{
+                //check if code exist or has been used by an email
+                if (codeToDelete==undefined) {
+                    res.status(422).json({message : 'Code does not exist'})
+                    connection.close()
+                    return
+                }
+                if (codeToDelete.customerEmail != null) {
+                    res.status(422).json({message : 'Code has already been used'})
+                    connection.close()
+                    return
+                }
 
-        //check if code exist or has been used by an email
-        if (codeToDelete==undefined) {
-            res.status(422).json({message : 'Code does not exist'})
-            connection.close()
-            return
-        }
-        if (codeToDelete.customerEmail != null) {
-            res.status(422).json({message : 'Code has already been used'})
-            connection.close()
-            return
-        }
+                //everything checked, let's delete
+                repository.delete(codeToDelete)
+                    .then(()=>{
+                        res.status(201).json({message : 'Code successfully deleted'})
+                        connection.close()
+                        return
+                    })
+                    .catch(err=> {
+                        res.status(422).json({message : err.message})
+                        connection.close()
+                        return
+                    })
 
-        //everything checked, let's delete
-        await repository.delete(codeToDelete)
-            .then(()=>{
-                res.status(201).json({message : 'Code successfully deleted'})
             })
             .catch(err=> {
                 res.status(422).json({message : err.message})
+                connection.close()
+                return
             })
-
-        connection.close()
-        return
+        
     })
     .catch(err=> {
         res.status(422).json({message : err.message})
