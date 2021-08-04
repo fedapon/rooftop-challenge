@@ -7,10 +7,8 @@ import deleteValidation from '../validators/stores/deleteValidation'
 
 const storesRouter = express.Router()
 
-const connection = createConnection()
-
-storesRouter.get('/stores', async function(req, res) {
-    try {
+storesRouter.get('/stores', function(req, res) {
+    createConnection().then(async connection => {
         //pagination calculation
         let startItem = 0
         let endItem = 10
@@ -28,26 +26,28 @@ storesRouter.get('/stores', async function(req, res) {
         }
 
         //lets find stores
-        let repository = (await connection).getRepository(Store)
-        repository.find(query)
+        let repository = connection.getRepository(Store)
+        await repository.find(query)
             .then(data => {
                 if (data == undefined) {
-                    return res.status(200).json({messsaje : 'no data found'})
+                    res.status(200).json({messsaje : 'no data found'})
                 }
-                let payload = {
+                let msg = {
                     count : data.length,
                     stores : data.slice(startItem, endItem),
                 }
-                return res.status(200).json(payload)
+                res.status(200).json(msg)
             })
             .catch(err=> {
-                return res.status(404).json({message : err.message})
+                res.status(404).json({message : err.message})
             })
 
-    }
-    catch (err) {
+        connection.close()
+        return
+    })
+    .catch(err=> {
         return res.status(404).json({message : err.message})
-    }
+    })
 })
 
 storesRouter.post('/stores', async function(req, res) {
@@ -56,24 +56,29 @@ storesRouter.post('/stores', async function(req, res) {
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
-    try {
+
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Store)
+        
         //lets add the new store
         let newStore = {
             name : req.body.name,
             address : req.body.address
         }
-        let repository = (await connection).getRepository(Store)
-        repository.save(newStore)
+        await repository.save(newStore)
             .then(()=> {
-                return res.status(201).json({message : 'Store successfully created'})
+                res.status(201).json({message : 'Store successfully created'})
             })
             .catch((err) => {
-                return res.status(422).json({message : err.message})
+                res.status(422).json({message : err.message})
             })
 
-    } catch (err) {
+        connection.close()
+        return
+    })
+    .catch((err) => {
         return res.status(422).json({message : err.message})
-    }
+    })
 })
 
 storesRouter.delete('/stores', function(req, res) {
@@ -86,26 +91,32 @@ storesRouter.delete('/stores/:id', async function(req, res) {
     if (validationResult.error) {
         return res.status(422).json({message : validationResult.error.details[0].message})
     }
-    try {
-        let repository = (await connection).getRepository(Store)
+
+    createConnection().then(async connection => {
+        let repository = connection.getRepository(Store)
         let storeToDelete = await repository.findOne(req.params)
 
         //check if store id exist
         if (storeToDelete==undefined) {
-            return res.status(422).json({message : 'Store does not exist'})
+            res.status(422).json({message : 'Store does not exist'})
+            connection.close()
+            return
         }
 
-        repository.delete(storeToDelete)
+        await repository.delete(storeToDelete)
             .then(() => {
-                return res.status(201).json({message : 'Store successfully deleted'})
+                res.status(201).json({message : 'Store successfully deleted'})
             })
             .catch((err) => {
-                return res.status(422).json({message : err.message})
+                res.status(422).json({message : err.message})
             })
 
-    } catch (err) {
+        connection.close()
+        return
+    })
+    .catch((err) => {
         return res.status(422).json({message : err.message})
-    }
+    })
 })
 
 export {storesRouter}
