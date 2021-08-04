@@ -118,8 +118,9 @@ couponsRouter.patch('/coupons', function (req, res) {
         repository.findOne({code : req.body.code})
             .then(codeAvailable=>{
                 let currentTime = new Date()
-                //check that the code exists and isn't expired
+                //check that the code exists, is available and isn't expired
                 if ( (codeAvailable == undefined) || 
+                    (codeAvailable.customerEmail != null) ||
                     ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) ) {
                     res.status(422).json({message : 'Coupon is not available'})
                     connection.close()
