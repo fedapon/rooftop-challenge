@@ -50,7 +50,7 @@ storesRouter.get('/stores', function(req, res) {
     })
 })
 
-storesRouter.post('/stores', async function(req, res) {
+storesRouter.post('/stores', function(req, res) {
     //validation
     let validationResult = postValidation.validate(req.body)
     if (validationResult.error) {
@@ -85,7 +85,7 @@ storesRouter.delete('/stores', function(req, res) {
     return res.status(422).json({message : 'id is required as a url param'})
 })
 
-storesRouter.delete('/stores/:id', async function(req, res) {
+storesRouter.delete('/stores/:id', function(req, res) {
     //validation
     let validationResult = deleteValidation.validate(req.params)
     if (validationResult.error) {
