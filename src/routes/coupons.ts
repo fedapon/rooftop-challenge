@@ -53,28 +53,36 @@ couponsRouter.post('/coupons', function (req, res) {
     createConnection().then(async connection => {
         let repository = connection.getRepository(Coupon)
         //check if code already exists
-        let searchedCode = await repository.findOne({code : req.body.code})
-        if (searchedCode != undefined) {
-            res.status(422).json({message : 'Coupon code already exists'})
+        try {
+            let searchedCode = await repository.findOne({code : req.body.code})
+            if (searchedCode != undefined) {
+                res.status(422).json({message : 'Coupon code already exists'})
+                connection.close()
+                return
+            }
+        }
+        catch (err) {
+            res.status(422).json({message : err.message})
             connection.close()
             return
         }
 
         //lets add the new code to the repository
-        let coupon : any = {
-            code : req.body.code,
-            expiresAt : req.body.expires_at
-        }
-        await repository.save(coupon)
+        let newCoupon = new Coupon
+        newCoupon.code = req.body.code
+        newCoupon.expiresAt = req.body.expires_at
+        
+        repository.save(newCoupon)
             .then(()=>{
                 res.status(201).json({message : 'Coupon successfully created'})
+                connection.close()
+                return
             })
             .catch(err => {
                 res.status(422).json({message : err.message})
+                connection.close()
+                return
             })
-        
-        connection.close()
-        return
 
     })
     .catch(err => {
