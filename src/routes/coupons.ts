@@ -101,36 +101,50 @@ couponsRouter.patch('/coupons', function (req, res) {
     createConnection().then(async connection => {
         let repository = connection.getRepository(Coupon)
         //check that the email wasn't already used
-        let emailAvailable = await repository.findOne({customerEmail : req.body.customer_email})
-        if (emailAvailable) {
-            res.status(422).json({message : 'Email was already been used'})
+        try {
+            let emailAvailable = await repository.findOne({customerEmail : req.body.customer_email})
+            if (emailAvailable) {
+                res.status(422).json({message : 'Email has already been used'})
+                connection.close()
+                return
+            }
+        }
+        catch (err) {
+            res.status(422).json({message : err.message})
             connection.close()
             return
         }
 
-        //check that the code exists and isn't expired
-        let codeAvailable = await repository.findOne({code : req.body.code})
-        let currentTime = new Date()
-        if ( (codeAvailable == undefined) || 
-            ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) 
-            ) {
-            res.status(422).json({message : 'Coupon is not available'})
-            connection.close()
-            return
-        }
-
-        codeAvailable.customerEmail = req.body.customer_email
-        codeAvailable.assignedAt = currentTime
-        await repository.save(codeAvailable)
-            .then(() => {
-                return res.status(201).json({message : 'Coupon successfully consumed'})
+        repository.findOne({code : req.body.code})
+            .then(codeAvailable=>{
+                let currentTime = new Date()
+                //check that the code exists and isn't expired
+                if ( (codeAvailable == undefined) || 
+                    ( (codeAvailable.expiresAt != null) && (codeAvailable.expiresAt < currentTime) ) ) {
+                    res.status(422).json({message : 'Coupon is not available'})
+                    connection.close()
+                    return
+                }
+                //update de available code with te customer email and timestamp
+                codeAvailable.customerEmail = req.body.customer_email
+                codeAvailable.assignedAt = currentTime
+                //save the entity in database
+                repository.save(codeAvailable)
+                    .then(() => {
+                        res.status(201).json({message : 'Coupon successfully consumed'})
+                        connection.close()
+                        return
+                    })
+                    .catch(err => {
+                        res.status(422).json({message : err.message})
+                        connection.close()
+                        return
+                    })
             })
-            .catch(err => {
+            .catch(err=>{
                 return res.status(422).json({message : err.message})
             })
-        
-        connection.close()
-        return
+
     })
     .catch(err => {
         return res.status(422).json({message : err.message})
@@ -156,7 +170,7 @@ couponsRouter.delete('/coupons', function(req, res) {
             return
         }
         if (codeToDelete.customerEmail != null) {
-            res.status(422).json({message : 'Code was already been used'})
+            res.status(422).json({message : 'Code has already been used'})
             connection.close()
             return
         }
