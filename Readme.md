@@ -50,7 +50,7 @@ Finally the API server will be running on http://localhost:3000/
 
 
 
-### Used libraries:
+### Reference libraries used in the challenge:
 
 Expressjs - https://expressjs.com/en/5x/api.html
 
@@ -64,8 +64,10 @@ Joi - https://joi.dev/api/?v=17.4.1
 
 https://github.com/Olanetsoft/weather-app-with-nodejs
 
+https://github.com/typeorm/typescript-express-example
+
+https://dev.to/yoshi_yoshi/typeorm-query-builder-with-subquery-490c
+
 https://javascript.info/async-await
 
 https://www.loginradius.com/blog/async/callback-vs-promises-vs-async-await/
-
-https://dev.to/yoshi_yoshi/typeorm-query-builder-with-subquery-490c
