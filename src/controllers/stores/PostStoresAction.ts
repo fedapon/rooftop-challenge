@@ -20,8 +20,12 @@ export function PostStoresAction(req : Request, res: Response) : Response {
             address : req.body.address
         }
         repository.save(newStore)
-            .then(()=> {
-                res.status(201).json({message : 'Store successfully created'})
+            .then((data)=> {
+                let msg = {
+                    message : 'Store successfully created',
+                    store: data
+                }
+                res.status(201).json(msg)
                 connection.close()
                 return
             })
