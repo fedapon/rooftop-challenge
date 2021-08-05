@@ -7,6 +7,7 @@ import { statsRouter } from './routes/stats'
 dotenv.config()
 const app = express()
 
+
 //middlewares
 app.use( express.json() )
 app.use( express.urlencoded({extended : false}))
@@ -20,6 +21,5 @@ app.use(storesRouter)
 //endPoint => '/stats'
 app.use(statsRouter)
 
-app.listen(process.env.EXPRESS_PORT, function() {
-    console.log("Server started")
-} )
+
+app.listen(process.env.EXPRESS_PORT)
