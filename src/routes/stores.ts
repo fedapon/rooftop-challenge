@@ -5,41 +5,13 @@ import express = require('express')
 import postValidation from '../validators/stores/postValidation'
 import deleteValidation from '../validators/stores/deleteValidation'
 import { GetStoresAction } from '../controllers/stores/GetStoresAction'
+import { PostStoresAction } from '../controllers/stores/PostStoresAction'
 
 const storesRouter = express.Router()
 
 storesRouter.get('/stores', GetStoresAction)
 
-storesRouter.post('/stores', function(req, res) {
-    //validation
-    let validationResult = postValidation.validate(req.body)
-    if (validationResult.error) {
-        return res.status(422).json({message : validationResult.error.details[0].message})
-    }
-
-    createConnection().then(async connection => {
-        let repository = connection.getRepository(Store)
-        
-        //lets add the new store
-        let newStore = {
-            name : req.body.name,
-            address : req.body.address
-        }
-        await repository.save(newStore)
-            .then(()=> {
-                res.status(201).json({message : 'Store successfully created'})
-            })
-            .catch((err) => {
-                res.status(422).json({message : err.message})
-            })
-
-        connection.close()
-        return
-    })
-    .catch((err) => {
-        return res.status(422).json({message : err.message})
-    })
-})
+storesRouter.post('/stores', PostStoresAction)
 
 storesRouter.delete('/stores', function(req, res) {
     return res.status(422).json({message : 'id is required as a url param'})
