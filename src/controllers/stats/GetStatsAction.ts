@@ -11,7 +11,7 @@ export function GetStatsAction(req : Request, res: Response) {
         //total amount of coupons in the database
         await repository.find()
             .then((data) => {
-                msg['total_coupons'] = data.length    
+                msg['totalCoupons'] = data.length    
             })
             .catch((err) => {
                 connection.close()
@@ -22,7 +22,7 @@ export function GetStatsAction(req : Request, res: Response) {
         //amount of assigned coupons   
         await repository.find( {customerEmail : Not(IsNull())} )
             .then((data) => {
-                msg['consumed_coupons'] = data.length    
+                msg['consumedCoupons'] = data.length    
             })
             .catch((err) => {
                 connection.close()
@@ -33,7 +33,7 @@ export function GetStatsAction(req : Request, res: Response) {
         //amount of available coupons
         await repository.find({customerEmail : IsNull()})
             .then((data) => {
-                msg['available_coupons'] = data.length    
+                msg['availableCoupons'] = data.length    
             })
             .catch((err) => {
                 connection.close()
@@ -50,7 +50,7 @@ export function GetStatsAction(req : Request, res: Response) {
                 .orderBy("TO_CHAR(coupons.assigned_at, 'yyyy-mm-dd')", "ASC")
                 .getRawMany()
             .then((data)=> {
-                msg['consumed_coupons_by_day'] = data
+                msg['consumedCouponsByDay'] = data
                 connection.close()
                 res.status(200).json(msg)
                 return  
