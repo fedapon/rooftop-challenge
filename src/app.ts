@@ -22,4 +22,6 @@ app.use(storesRouter)
 app.use(statsRouter)
 
 
-app.listen(process.env.EXPRESS_PORT)
+app.listen(process.env.EXPRESS_PORT,function (){
+    console.log('Server started again')
+})
