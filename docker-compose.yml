@@ -18,6 +18,8 @@ services:
       - '5432:5432'
     volumes:
       - rooftop-postgres-data:/var/lib/postgres/data/
+      #copy sql script to ceate schemma, tables and demo data
+      - ./sql/rooftop-backend-challenge-postgre.sql:/docker-entrypoint-initdb.d/create_tables.sql
 
 volumes:
   rooftop-postgres-data:
