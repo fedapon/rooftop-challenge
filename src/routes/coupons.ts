@@ -1,8 +1,10 @@
 import express = require('express')
-import {GetCouponsAction} from '../controllers/coupons/GetCouponsAction'
-import {PostCouponsAction} from '../controllers/coupons/PostCouponsAction'
-import { PatchCouponsAction } from '../controllers/coupons/PatchCouponsAction'
-import { DeleteCouponsAction } from '../controllers/coupons/DeleteCouponsAction'
+import { GetCouponsAction,
+    PostCouponsAction,
+    PatchCouponsAction,
+    DeleteCouponsAction
+} from '../controllers/coupons'
+
 
 const couponsRouter = express.Router()
 
