@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { createConnection, Like } from 'typeorm'
+import { Like } from 'typeorm'
 import { connection } from '../app';
 import { Request, Response } from "express";
 import Store from '../entity/Store'
@@ -31,7 +31,7 @@ export async function GetStoresAction(req: Request, res: Response) {
     }
 
     //lets find stores
-    repository.find(query)
+    await repository.find(query)
         .then(data => {
             if (data == undefined) {
                 res.status(200).json({ messsaje: 'no data found' })
@@ -61,7 +61,7 @@ export async function PostStoresAction(req: Request, res: Response) {
         name: req.body.name,
         address: req.body.address
     }
-    repository.save(newStore)
+    await repository.save(newStore)
         .then((data) => {
             let msg = {
                 message: 'Store successfully created',

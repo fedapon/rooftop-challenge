@@ -4,9 +4,11 @@ import { couponsRouter } from './routes/coupons'
 import { storesRouter } from './routes/stores'
 import { statsRouter } from './routes/stats'
 
+import { createConnection } from 'typeorm'
+
 dotenv.config()
 const app = express()
-
+const connection = createConnection()
 
 //middlewares
 app.use( express.json() )
@@ -23,5 +25,7 @@ app.use(statsRouter)
 
 
 app.listen(process.env.EXPRESS_PORT,function (){
-    console.log('Server started again')
+    console.log(`Server started on port: ${process.env.EXPRESS_PORT}`)
 })
+
+export {connection}

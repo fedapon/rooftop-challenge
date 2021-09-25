@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { createConnection, Not, IsNull } from 'typeorm'
+import { Not, IsNull } from 'typeorm'
 import { connection } from '../app';
 import { Request, Response } from "express";
 import Coupon from '../entity/Coupon'
