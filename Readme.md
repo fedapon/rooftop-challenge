@@ -24,16 +24,23 @@ Before trying to run the app, you must create a ***.env*** file using the ***.en
 ```
 EXPRESS_PORT=3000
 
+#docker-compose credentials
+POSTGRES_USER=YOUR_USERNAME_POSTGRES_CONTAINER
+POSTGRES_PASSWORD=OUR_USERNAME_POSTGRES_CONTAINER
+POSTGRES_DB=YOUR_DATABASE_NAME_POSTGRES_CONTAINER
+
 TYPEORM_CONNECTION = postgres
 TYPEORM_HOST = localhost
 TYPEORM_USERNAME = YOUR_USERNAME
 TYPEORM_PASSWORD = YOUR_PASSWORD
 TYPEORM_DATABASE = YOUR_DATABASE_NAME
-TYPEORM_SCHEMA= YOUR_SCHEMA
+TYPEORM_SCHEMA= rooftop-backend-challenge
 TYPEORM_PORT = 5432
 TYPEORM_SYNCHRONIZE = false
 TYPEORM_LOGGING = false
 TYPEORM_ENTITIES = dist/entity/*.js
+#to use the dev script uncomment next line, and comment the last one
+#TYPEORM_ENTITIES = src/entity/*.ts
 ```
 
 
