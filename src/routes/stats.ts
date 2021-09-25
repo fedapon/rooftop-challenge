@@ -1,5 +1,5 @@
 import express = require('express')
-import { GetStatsAction } from '../controllers/stats/GetStatsAction'
+import { GetStatsAction } from '../controllers/stats'
 
 const statsRouter = express.Router()
 

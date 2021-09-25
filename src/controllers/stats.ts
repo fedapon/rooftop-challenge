@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { createConnection, Not, IsNull} from 'typeorm'
 import {Request, Response} from "express";
-import Coupon from '../../entity/Coupon'
+import Coupon from '../entity/Coupon'
 
 
 export function GetStatsAction(req : Request, res: Response) {
