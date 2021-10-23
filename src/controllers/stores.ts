@@ -78,7 +78,7 @@ export async function PostStoresAction(req: Request, res: Response) {
             return
         })
         .catch((err) => {
-            errorResponse(res, err, 404)
+            errorResponse(res, err, 422)
         })
 }
 
