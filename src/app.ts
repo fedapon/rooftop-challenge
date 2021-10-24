@@ -24,8 +24,8 @@ app.use(storesRouter)
 app.use(statsRouter)
 
 
-app.listen(process.env.EXPRESS_PORT,function (){
+const server = app.listen(process.env.EXPRESS_PORT,function (){
     console.log(`Server started on port: ${process.env.EXPRESS_PORT}`)
 })
 
-export {connection}
+export {app, server, connection}
