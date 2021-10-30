@@ -1,0 +1,183 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "rooftop-challenge",
+        "description": "API REST developed with Node.Js (express, joi, typeORM, postgres, jest and docker).",
+        "version": "1.0.0"
+    },
+    "servers": [{
+        "url": "/",
+        "description": ""
+    }],
+    "tags": [{
+        "name": "Coupons",
+        "description": ""
+    }, {
+        "name": "Stores",
+        "description": ""
+    }, {
+        "name": "Stats",
+        "description": ""
+    }],
+    "paths": {
+        "/stores": {
+            "get": {
+                "tags": ["Stores"],
+                "summary": "Get all stores in system",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Stores"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Stores"],
+                "summary": "Post a new stores in system",
+                "requestBody": {
+                    "description": "New store object",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                               "type": "object",
+                               "properties": {
+                                   "name": {
+                                       "type": "string"
+                                   },
+                                   "address": {
+                                       "type": "string"
+                                   }
+                               },
+                               "required": ["name", "address"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Store successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type":"string"
+                                        },
+                                        "store": {
+                                            "$ref": "#/components/schemas/Store"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error. Operation not completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type":"string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stores/{id}": {
+            "parameters": [{
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "description": "id of the store to delete",
+                "schema": {
+                    "type": "integer"
+                }
+            }],
+            "delete": {
+                "tags": ["Stores"],
+                "summary": "Delete an existing store in system",
+                "responses": {
+                    "201": {
+                        "description": "Store successfully deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type":"string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or store does not exist. Operation not completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type":"string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Store": {
+                "required": ["name", "address"],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Stores": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "stores": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Store"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
