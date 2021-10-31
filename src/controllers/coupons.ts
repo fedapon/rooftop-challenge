@@ -15,7 +15,7 @@ function errorResponse(res: Response, err: any, status: number) {
 
 export async function GetCouponsAction(req: Request, res: Response) {
     //validation
-    let validationResult = getValidation.validate(req.body)
+    let validationResult = getValidation.validate(req.query)
     if (validationResult.error) {
         return res
             .status(404)
@@ -26,8 +26,8 @@ export async function GetCouponsAction(req: Request, res: Response) {
     //try to find code and email match
     await repository
         .findOne({
-            code: req.body.code,
-            customerEmail: req.body.customer_email,
+            code: req.query.code as any,
+            customerEmail: req.query.customer_email as any,
         })
         .then((data) => {
             if (data == undefined) {

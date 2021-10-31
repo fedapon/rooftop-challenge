@@ -10,29 +10,11 @@
 			"item": [
 				{
 					"name": "coupons",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "code",
-									"value": "H37VUSZS",
-									"type": "text"
-								},
-								{
-									"key": "customer_email",
-									"value": "abmem@vuec.ps",
-									"type": "text"
-								}
-							]
-						},
 						"url": {
-							"raw": "http://localhost:3000/coupons",
+							"raw": "http://localhost:3000/coupons?code=H37VUSZS&customer_email=abmem@vuec.ps",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -40,6 +22,16 @@
 							"port": "3000",
 							"path": [
 								"coupons"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "H37VUSZS"
+								},
+								{
+									"key": "customer_email",
+									"value": "abmem@vuec.ps"
+								}
 							]
 						}
 					},
@@ -124,11 +116,6 @@
 								{
 									"key": "code",
 									"value": "12345678",
-									"type": "text"
-								},
-								{
-									"key": "customer_email",
-									"value": "fedapon@gmail.com",
 									"type": "text"
 								}
 							]
