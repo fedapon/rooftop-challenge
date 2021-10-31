@@ -20,9 +20,257 @@
         "description": ""
     }],
     "paths": {
+        "/coupons": {
+            "get": {
+                "tags": ["Coupons"],
+                "summary": "Verify that a coupon and email match was found",
+                "parameters": [{
+                    "in": "query",
+                    "name": "code",
+                    "required": true,
+                    "description": "Code to be checked",
+                    "schema": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "in": "query",
+                    "name": "customer_email",
+                    "required": true,
+                    "description": "Email to be checked",
+                    "schema": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Coupon and email match was found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Coupon and email match was found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Coupon code and email was not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Coupon code and email was not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Coupons"],
+                "summary": "Add a new coupon code in system",
+                "requestBody": {
+                    "description": "New coupon to be added",
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "expires_at": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["code", "expires_at"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Coupon successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Coupon successfully created"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error. Operation not completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error. Operation not completed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Coupons"],
+                "summary": "Consume a Coupon from the system",
+                "requestBody": {
+                    "description": "Coupon to consume and customer's email",
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "customer_email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["code", "customer_email"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Coupon successfully consumed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Coupon successfully consumed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error. Operation not completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error. Operation not completed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Coupons"],
+                "summary": "Delete a Coupon in system",
+                "requestBody": {
+                    "description": "Coupon to be deleted",
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["code"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Coupon successfully deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Coupon successfully deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error. Operation not completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error. Operation not completed"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/stores": {
             "get": {
                 "tags": ["Stores"],
+                "parameters": [{
+                        "in": "query",
+                        "name": "name",
+                        "required": false,
+                        "description": "Optional, filter by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "description": "Page number of the store list",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "summary": "Get all stores in system",
                 "responses": {
                     "200": {
@@ -45,16 +293,16 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                               "type": "object",
-                               "properties": {
-                                   "name": {
-                                       "type": "string"
-                                   },
-                                   "address": {
-                                       "type": "string"
-                                   }
-                               },
-                               "required": ["name", "address"]
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["name", "address"]
                             }
                         }
                     },
@@ -69,7 +317,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type":"string"
+                                            "type": "string",
+                                            "example": "Store successfully created"
                                         },
                                         "store": {
                                             "$ref": "#/components/schemas/Store"
@@ -87,7 +336,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type":"string"
+                                            "type": "string",
+                                            "example": "Validation error. Operation not completed"
                                         }
                                     }
                                 }
@@ -119,7 +369,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type":"string"
+                                            "type": "string",
+                                            "example": "Store successfully deleted"
                                         }
                                     }
                                 }
@@ -134,7 +385,54 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type":"string"
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stats": {
+            "get": {
+                "tags": ["Stats"],
+                "summary": "Stats of the coupons database",
+                "responses": {
+                    "200": {
+                        "description": "Stats of the coupons database",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totalCoupons": {
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "consumedCoupons": {
+                                            "type": "integer",
+                                            "example": 65
+                                        },
+                                        "availableCoupons": {
+                                            "type": "integer",
+                                            "example": 35
+                                        }
+                                        ,"consumedCouponsByDay": {
+                                            "type": "array",
+                                            "items":{
+                                                "properties": {
+                                                    "day": {
+                                                        "type": "string",
+                                                        "example": "2021-10-31"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -147,19 +445,40 @@
     },
     "components": {
         "schemas": {
+            "Coupon": {
+                "required": ["expires_at"],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "expires_at": {
+                        "type": "string"
+                    },
+                    "assigned_at": {
+                        "type": "string"
+                    },
+                    "customer_email": {
+                        "type": "string"
+                    }
+                }
+            },
             "Store": {
                 "required": ["name", "address"],
                 "type": "object",
                 "properties": {
                     "id": {
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": "1"
                     },
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "The Big One Store"
                     },
                     "address": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "5th Avenue 1234"
                     }
                 }
             },
